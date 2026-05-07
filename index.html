@@ -1985,11 +1985,261 @@
     .ov-footer { grid-template-columns: repeat(2, 1fr); }
   }
 
+  /* ============ 태블릿 / 좁은 노트북 (≤760px) ============ */
   @media (max-width: 760px) {
+    body { padding: 10px; }
+    .container { border-radius: 12px; }
+
+    /* 헤더 */
+    .header { padding: 18px 18px; }
+    .header h1 { font-size: 18px; padding-right: 0; line-height: 1.3; }
+    .header .subtitle { font-size: 11.5px; padding-right: 0; }
+    .header .logo {
+      position: static; transform: none;
+      display: block; margin-top: 10px;
+    }
+    .header .logo img { height: 34px; }
+
+    /* 본문 — 입력/결과 1단으로 */
     .body { grid-template-columns: 1fr; }
+    .input-section, .output-section {
+      padding: 18px 16px;
+    }
     .input-section { border-right: none; border-bottom: 1px solid var(--ink-100); }
-    .header .logo { display: none; }
-    .form-row, .form-row-3 { grid-template-columns: 1fr; }
+
+    /* 입력 그룹 */
+    .input-group { padding: 14px 14px; margin-bottom: 12px; }
+    .group-title { font-size: 13px; margin-bottom: 12px; }
+    .section-title { font-size: 14px; margin-bottom: 14px; padding-bottom: 8px; }
+
+    /* form-row 단수화 */
+    .form-row, .form-row-3 { grid-template-columns: 1fr; gap: 8px; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { font-size: 12px; }
+    .form-group input, .form-group select {
+      font-size: 16px;            /* iOS 자동 줌 방지 */
+      padding: 12px 56px 12px 12px;
+      min-height: 44px;
+    }
+    .form-group select { padding: 12px 32px 12px 12px; }
+    .unit { font-size: 12px; right: 10px; }
+
+    /* 부속 옵션 — 가로 스크롤 안 되도록 wrap */
+    .opt-row { flex-direction: column; gap: 6px; }
+    .opt-chip { flex: 1 0 100%; padding: 9px 12px; font-size: 13px; min-height: 40px; }
+
+    /* 비밀번호 게이트 */
+    .pwd-gate { padding: 11px 12px 12px; }
+    .pwd-gate input[type="password"], .pwd-gate input[type="text"] {
+      font-size: 16px; min-height: 44px; padding: 11px 44px 11px 12px;
+    }
+
+    /* 액션 버튼 */
+    .button-row { gap: 8px; }
+    .btn { padding: 14px 12px; font-size: 14px; min-height: 48px; }
+
+    /* RF 로더 */
+    .rf-loader { flex-direction: column; align-items: stretch; gap: 8px; padding: 11px 12px; }
+    .rf-loader label.file-btn { text-align: center; }
+
+    /* 결과 영역 */
+    .highlight-card { padding: 12px 14px; }
+    .highlight-card .value { font-size: 20px; }
+    .capacity-row, .design-rec-row { grid-template-columns: 1fr; gap: 8px; }
+    .design-rec-row .rec-card { padding: 10px 12px; }
+
+    /* 비교 매트릭스 표 — 좌우 스크롤 가능하게 */
+    .comparison-section { padding: 16px 14px 18px; }
+    .comparison-section table {
+      display: block; overflow-x: auto; white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      font-size: 11.5px;
+    }
+    .comparison-section thead, .comparison-section tbody, .comparison-section tr { display: table; width: 100%; table-layout: fixed; }
+    .comparison-section tbody { display: block; }
+    .comparison-section tbody tr { display: table; width: 100%; }
+    .comparison-section thead th, .comparison-section tbody td { padding: 8px 10px; }
+
+    /* 푸터 */
+    .footer { padding: 11px 14px; font-size: 10.5px; }
+
+    /* ============ 개요 모달 ============ */
+    .ov-overlay { padding: 8px 6px; }
+    .ov-modal { border-radius: 10px; }
+    .ov-header { padding: 11px 14px; gap: 6px; }
+    .ov-header .ov-title .eyebrow { font-size: 9.5px; }
+    .ov-header .ov-title .main { font-size: 14px; }
+    .ov-header .ov-title .main .sub { display: block; margin-left: 0; margin-top: 2px; font-size: 10.5px; }
+    .ov-header .x-btn, .ov-header .ov-print-btn { width: 38px; height: 38px; font-size: 16px; }
+
+    .ov-body { grid-template-columns: 1fr; }
+    .ov-side { padding: 14px 14px 16px; gap: 10px; }
+    .ov-side .ov-thumb { padding: 8px; }
+    .ov-side .ov-model-code { font-size: 19px; }
+    .ov-side .ov-keylist { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+    .ov-side .ov-keyrow { grid-template-columns: 1fr auto; padding: 6px 0; font-size: 11px; }
+    .ov-side .ov-keyrow .v { font-size: 11.5px; }
+
+    .ov-main { padding: 14px 14px 16px; }
+    .ov-tabs { margin: -2px -2px 12px; padding: 0 2px; }
+    .ov-tab { padding: 9px 11px 8px; font-size: 12px; }
+    .ov-section-title { font-size: 12px; padding: 6px 11px; margin: 12px 0 8px; }
+
+    .ov-hero { grid-template-columns: 1fr; gap: 12px; }
+    .ov-hero .ov-bigdiagram { padding: 10px; min-height: 200px; }
+    .ov-hero .ov-bigdiagram img { max-height: 240px; }
+
+    .ov-stats { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .ov-stats .stat { padding: 8px 10px; }
+    .ov-stats .stat .k { font-size: 10px; }
+    .ov-stats .stat .v { font-size: 14px; }
+    .ov-stats .stat .v .u { font-size: 10px; }
+
+    .ov-principle { padding: 10px 12px; }
+    .ov-principle .pb { font-size: 11.5px; line-height: 1.55; }
+
+    .ov-result-strip { grid-template-columns: 1fr; gap: 6px; padding: 10px 12px; }
+    .ov-result-strip .arr { display: none; }
+    .ov-result-strip .rs { padding: 5px 4px; text-align: center; }
+    .ov-result-strip .rs.hl { padding: 7px 10px; }
+
+    .ov-fullspec { font-size: 11.5px; }
+    .ov-fullspec th, .ov-fullspec td { padding: 6px 8px; }
+    .ov-flowtable { font-size: 11.5px; }
+    .ov-flowtable th, .ov-flowtable td { padding: 7px 8px; }
+
+    /* 푸터 5개 버튼 → 모바일에서 3+2 그리드 */
+    .ov-footer { grid-template-columns: repeat(3, 1fr); padding: 11px 12px; gap: 7px; }
+    .ov-action { padding: 9px 5px 8px; }
+    .ov-action .icon { font-size: 19px; }
+    .ov-action .label { font-size: 11px; }
+    .ov-action .sub { font-size: 8.5px; }
+
+    /* ============ 보고서 모달 (선정서/보급수/루버) ============ */
+    .report-overlay { padding: 10px 6px; }
+    .report-modal { border-radius: 8px; }
+    .report-toolbar { padding: 8px 12px; font-size: 11px; }
+    .report-toolbar button { padding: 7px 12px; font-size: 11px; min-height: 36px; }
+    .report-body { padding: 18px 16px 18px; font-size: 12.5px; }
+    .report-header { grid-template-columns: 1fr; gap: 10px; padding-bottom: 10px; margin-bottom: 14px; }
+    .report-header .title-block .main-title { font-size: 18px; }
+    .report-header .logo-block { text-align: left; }
+    .report-header .logo-block .corp { text-align: left; font-size: 9.5px; }
+    .report-meta { grid-template-columns: 1fr; gap: 4px 0; padding: 10px 12px; }
+    .report-meta .row { padding: 3px 0; }
+
+    .report-section-title { font-size: 12.5px; padding: 6px 11px; margin: 14px 0 9px; }
+
+    .report-selected { grid-template-columns: 1fr; gap: 10px; padding: 10px 12px; }
+    .report-selected .model-info .model-code { font-size: 18px; }
+    .report-selected .model-spec-row { width: 100%; flex-wrap: wrap; gap: 6px; }
+    .report-selected .model-spec-row .spec-cell {
+      padding: 5px 10px; flex: 1 1 30%; border-left: none;
+      background: var(--bg-50); border-radius: 5px;
+    }
+    .report-selected .model-spec-row .spec-cell:first-child { border-left: none; }
+
+    .report-grid { grid-template-columns: 1fr; gap: 1px 0; }
+    .report-grid .row { padding: 6px 0; }
+    .report-table { font-size: 11.5px; display: block; overflow-x: auto; }
+    .report-table thead, .report-table tbody, .report-table tr { width: 100%; }
+    .report-table th, .report-table td { padding: 6px 8px; }
+
+    .report-dim-row { padding: 8px 12px; }
+    .report-dim-row .dim-head { flex-direction: column; align-items: flex-start; gap: 3px; }
+    .report-dim-row .dim-body { flex-direction: column; gap: 4px; }
+    .report-dim-row .dim-body .sep { display: none; }
+
+    .report-disclaimer { padding: 10px 12px; font-size: 10.5px; line-height: 1.55; }
+    .report-footer { grid-template-columns: 1fr; gap: 6px; }
+    .report-footer .signature { text-align: left; }
+
+    /* 보급수·루버 — 컴팩트 표·박스 */
+    .calc-meta { grid-template-columns: 1fr; gap: 5px 0; padding: 10px 12px; font-size: 12px; }
+    .calc-step { padding: 10px 12px; }
+    .calc-step .formula-line { font-size: 11.5px; padding: 7px 10px; overflow-x: auto; white-space: nowrap; }
+    .calc-result-card { grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; text-align: left; }
+    .calc-result-card .num { font-size: 24px; }
+    .calc-result-card .num .unit { font-size: 16px; }
+    .calc-mini-row { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .calc-mini-row .cell { padding: 8px 10px 9px; }
+    .calc-unified { font-size: 11.5px; display: block; overflow-x: auto; }
+    .calc-unified thead, .calc-unified tbody, .calc-unified tr { width: 100%; }
+    .calc-unified th, .calc-unified td { padding: 6px 8px; }
+    .calc-mini-footer { grid-template-columns: 1fr; gap: 8px; }
+    .calc-mini-footer .corp { text-align: left; }
+    .calc-table { font-size: 11px; display: block; overflow-x: auto; }
+    .calc-criteria { font-size: 11px; }
+
+    /* placeholder 팝업 */
+    .ph-modal { max-width: 92vw; }
+
+    /* 모드 전환 — 인쇄 시는 desktop 폼 그대로 사용해야 하므로 모바일 룰을 인쇄에서 풀어줌 */
+  }
+
+  /* ============ 휴대폰 (≤480px) ============ */
+  @media (max-width: 480px) {
+    body { padding: 6px; }
+    .header { padding: 14px 14px; }
+    .header h1 { font-size: 16px; }
+    .header .subtitle { font-size: 11px; }
+
+    .input-section, .output-section { padding: 14px 12px; }
+    .input-group { padding: 12px 12px; }
+
+    .form-group input, .form-group select,
+    .pwd-gate input { font-size: 16px; }
+
+    /* 매트릭스 행 안에 br 처리되어 있는 텍스트가 좁아 보이도록 */
+    .comparison-section { padding: 14px 12px 16px; }
+    .comparison-section table { font-size: 11px; }
+    .comparison-section thead th, .comparison-section tbody td { padding: 7px 8px; }
+
+    /* 개요 모달 — 헤더 더 컴팩트 */
+    .ov-header { padding: 9px 12px; }
+    .ov-header .ov-title .main { font-size: 13px; }
+    .ov-header .ov-title .eyebrow { font-size: 9px; }
+    .ov-side .ov-keylist { grid-template-columns: 1fr; gap: 0; }
+
+    .ov-stats { grid-template-columns: 1fr 1fr; }
+    .ov-stats .stat .v { font-size: 13px; }
+
+    /* 푸터 5개 버튼 → 2열 */
+    .ov-footer { grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 10px 11px; }
+    .ov-action { padding: 8px 4px 7px; }
+    .ov-action .icon { font-size: 18px; }
+    .ov-action .label { font-size: 10.5px; }
+
+    /* 보고서 본문 */
+    .report-body { padding: 14px 12px; font-size: 12px; }
+    .report-header .title-block .main-title { font-size: 16px; }
+    .report-section-title { font-size: 12px; padding: 5px 10px; }
+    .report-selected .model-info .model-code { font-size: 16px; }
+    .report-selected .model-spec-row .spec-cell { flex: 1 1 45%; }
+
+    .calc-result-card .num { font-size: 22px; }
+    .calc-result-card .num .unit { font-size: 14px; }
+    .calc-mini-row .cell .v { font-size: 15px; }
+  }
+
+  /* ============ 초소형 폰 (≤380px) ============ */
+  @media (max-width: 380px) {
+    body { padding: 4px; }
+    .header h1 { font-size: 15px; }
+    .header .subtitle { font-size: 10.5px; }
+    .header .logo img { height: 28px; }
+
+    .input-section, .output-section { padding: 12px 10px; }
+    .section-title { font-size: 13px; }
+
+    .ov-modal { border-radius: 8px; }
+    .ov-header .ov-title .main { font-size: 12.5px; }
+    .ov-action .label { font-size: 10px; }
+    .ov-action .sub { display: none; }
+
+    .calc-result-card .num { font-size: 20px; }
+    .report-selected .model-info .model-code { font-size: 15px; }
+    .report-selected .model-spec-row .spec-cell { flex: 1 1 100%; }
   }
 
   /* ===== 인쇄 색상 보존 ===== */
@@ -4126,3 +4376,4 @@ closeReport = function(e) {
 </script>
 </body>
 </html>
+
