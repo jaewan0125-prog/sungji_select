@@ -1985,6 +1985,212 @@
     .ov-footer { grid-template-columns: repeat(2, 1fr); }
   }
 
+
+  /* ============ 관리자 모드 배너 ============ */
+  .admin-banner {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 2000;
+    background: linear-gradient(90deg, var(--org-700) 0%, var(--org-600) 50%, var(--org-700) 100%);
+    color: white;
+    padding: 7px 16px;
+    box-shadow: 0 3px 12px rgba(216,67,21,0.32);
+    text-align: center;
+    border-bottom: 2px solid var(--org-800);
+    font-size: 12.5px;
+    letter-spacing: 0.3px;
+  }
+  body.admin-mode .admin-banner { display: block; }
+  body.admin-mode { padding-top: 36px; }
+  .admin-banner-inner {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-weight: 700;
+  }
+  .admin-banner-inner .admin-icon { font-size: 14px; line-height: 1; }
+  .admin-banner-inner .admin-title { letter-spacing: 0.3px; }
+  .admin-banner-inner .admin-title .admin-sub {
+    margin-left: 6px;
+    font-size: 11px;
+    opacity: 0.85;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .admin-banner-inner .admin-pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 0 0 rgba(255,255,255,0.7);
+    animation: adminPulse 1.6s infinite;
+  }
+  @keyframes adminPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+    70%  { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  }
+
+  /* admin-mode 가 활성이면 메인 헤더 상단에 오렌지 액센트 */
+  body.admin-mode .header {
+    border-top: 3px solid var(--org-600);
+    box-shadow: inset 0 4px 0 0 var(--org-700);
+  }
+  body.admin-mode .header h1::after {
+    content: ' · ADMIN';
+    color: var(--org-200);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-left: 10px;
+    vertical-align: 1px;
+  }
+
+  /* 비밀번호 게이트 — 관리자 인증 상태 */
+  .pwd-gate.admin {
+    background: var(--org-100);
+    border-color: var(--org-700);
+  }
+  .pwd-gate.admin .pwd-head { color: var(--org-800); }
+  .pwd-gate.admin .pwd-head .lock { font-size: 14px; }
+  .pwd-gate.admin .pwd-head .lock::before { content: '👑'; }
+  .pwd-gate.admin .pwd-head .lock { font-size: 0; }
+  .pwd-gate.admin .pwd-head .lock::before { font-size: 14px; }
+  .pwd-gate.admin .pwd-status {
+    background: var(--org-700); color: white;
+  }
+  .pwd-gate.admin input { border-color: var(--org-700); }
+
+  /* 잠금 해제 후 selection 결과 박스에도 admin 마커 — overview 헤더에 작은 ADMIN 칩 */
+  body.admin-mode .ov-header::after {
+    content: 'ADMIN';
+    background: rgba(255,255,255,0.18);
+    color: white;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    padding: 3px 9px;
+    border-radius: 10px;
+    margin-left: 8px;
+    align-self: center;
+    white-space: nowrap;
+  }
+
+  /* 모바일에서는 배너 폰트 좀 더 작게 + 헤더 padding 보정 */
+  @media (max-width: 480px) {
+    .admin-banner { padding: 6px 10px; font-size: 11px; }
+    .admin-banner-inner { gap: 6px; }
+    .admin-banner-inner .admin-title .admin-sub { display: none; }
+    body.admin-mode { padding-top: 30px; }
+  }
+
+  /* 인쇄 시 관리자 배너 숨김 (보고서엔 영향 X) */
+  @media print {
+    .admin-banner { display: none !important; }
+    body.admin-mode { padding-top: 0 !important; }
+  }
+
+
+  /* ============ 관리자 전용 — 원가 계산프로그램 버튼 ============ */
+  /* 일반 페이지에서는 절대 표시되지 않도록 강제 */
+  .admin-only { display: none !important; }
+  body.admin-mode .admin-only { display: block !important; }
+
+  .admin-cost-block {
+    grid-column: 1 / -1;
+    padding: 14px 32px 20px;
+    background: white;
+    border-top: 2px solid var(--ink-100);
+  }
+  .adm-cost-card {
+    background: linear-gradient(135deg, var(--org-700) 0%, var(--org-600) 55%, var(--pri-700) 130%);
+    border-radius: 12px;
+    padding: 16px 22px;
+    cursor: pointer;
+    color: white;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 18px;
+    align-items: center;
+    box-shadow: 0 6px 18px rgba(216,67,21,0.20);
+    transition: all 0.2s;
+    border: 2px solid var(--org-700);
+    position: relative;
+    overflow: hidden;
+  }
+  .adm-cost-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--org-500) 0%, white 50%, var(--pri-500) 100%);
+    opacity: 0.6;
+  }
+  .adm-cost-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(216,67,21,0.32);
+    border-color: var(--org-800);
+  }
+  .adm-cost-card:active { transform: translateY(0); }
+  .adm-cost-card:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.4), 0 6px 18px rgba(216,67,21,0.32); }
+
+  .adm-cost-icon {
+    font-size: 32px;
+    line-height: 1;
+    background: rgba(255,255,255,0.18);
+    width: 56px; height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
+  .adm-cost-text { min-width: 0; }
+  .adm-cost-title {
+    font-size: 17px; font-weight: 800;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  }
+  .adm-cost-title .adm-badge {
+    background: rgba(255,255,255,0.22);
+    color: white;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 3px 9px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.35);
+  }
+  .adm-cost-sub {
+    font-size: 12px;
+    opacity: 0.92;
+    letter-spacing: 0.2px;
+  }
+  .adm-cost-arrow {
+    font-size: 28px;
+    font-weight: 800;
+    opacity: 0.85;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .adm-cost-card:hover .adm-cost-arrow { transform: translate(2px,-2px); opacity: 1; }
+
+  /* 모바일 — 원가 카드 컴팩트 */
+  @media (max-width: 760px) {
+    .admin-cost-block { padding: 12px 16px 16px; }
+    .adm-cost-card { padding: 13px 16px; gap: 14px; }
+    .adm-cost-icon { width: 48px; height: 48px; font-size: 26px; border-radius: 10px; }
+    .adm-cost-title { font-size: 15px; }
+    .adm-cost-title .adm-badge { font-size: 9.5px; padding: 2px 7px; }
+    .adm-cost-sub { font-size: 11px; }
+    .adm-cost-arrow { font-size: 22px; }
+  }
+  @media (max-width: 480px) {
+    .admin-cost-block { padding: 10px 12px 14px; }
+    .adm-cost-card { grid-template-columns: auto 1fr; padding: 12px 14px; gap: 11px; }
+    .adm-cost-icon { width: 42px; height: 42px; font-size: 22px; }
+    .adm-cost-title { font-size: 14px; gap: 6px; }
+    .adm-cost-sub { font-size: 10.5px; }
+    .adm-cost-arrow { display: none; }
+  }
+  /* 인쇄에서는 admin 카드 숨김 */
+  @media print { .admin-cost-block { display: none !important; } }
+
   /* ============ 태블릿 / 좁은 노트북 (≤760px) ============ */
   @media (max-width: 760px) {
     body { padding: 10px; }
@@ -2330,6 +2536,14 @@
 </style>
 </head>
 <body>
+<!-- 관리자 모드 배너 (관리자 인증 시 표시) -->
+<div id="adminBanner" class="admin-banner">
+  <div class="admin-banner-inner">
+    <span class="admin-icon">🔐</span>
+    <span class="admin-title">관리자 모드 <span class="admin-sub">ADMIN MODE — 영업1팀</span></span>
+    <span class="admin-pulse"></span>
+  </div>
+</div>
 <div class="container">
 
   <div class="header">
@@ -2498,6 +2712,22 @@
           <div class="icon">📊</div>
           <div>좌측에 설계 조건을 모두 입력 후<br>「선정 계산」버튼을 눌러주세요</div>
         </div>
+      </div>
+    </div>
+
+    <!-- 관리자 전용: 냉각탑 원가 계산 프로그램 (영업1팀 인증 시에만 표시) -->
+    <div id="adminCostBlock" class="admin-cost-block admin-only">
+      <div class="adm-cost-card" onclick="openCostProgram()" role="button" tabindex="0"
+           onkeydown="if(event.key==='Enter'||event.key===' ')openCostProgram()">
+        <div class="adm-cost-icon">💰</div>
+        <div class="adm-cost-text">
+          <div class="adm-cost-title">
+            냉각탑 원가 계산프로그램
+            <span class="adm-badge">관리자 전용</span>
+          </div>
+          <div class="adm-cost-sub">Cooling Tower Cost Estimation · 영업1팀 내부 사용</div>
+        </div>
+        <div class="adm-cost-arrow">↗</div>
       </div>
     </div>
 
@@ -3430,8 +3660,10 @@ function resetForm() {
 }
 
 // ============ 비밀번호 게이트 ============
-const _PWD_HASH = '42fdf1d1baff5a40a6b712ea751d68f718485ef1a93adf6ecda2d95c603524bf';   // SHA-256('sealove7*')
+const _PWD_HASH       = '42fdf1d1baff5a40a6b712ea751d68f718485ef1a93adf6ecda2d95c603524bf';   // SHA-256('sealove7*')
+const _ADMIN_PWD_HASH = '9dbf43a0604ec0feb85b7a93f63909d2a0dea37fca11816cafaf0113f95543c3';   // SHA-256('영업1팀@')
 let _isUnlocked = false;
+let _isAdmin    = false;
 
 async function _sha256(text) {
   const enc = new TextEncoder().encode(text);
@@ -3441,10 +3673,13 @@ async function _sha256(text) {
 }
 
 async function _verifyPwd(input) {
+  // 두 비밀번호 (일반 / 관리자) 모두 검증. 일치 시 'user' / 'admin' 반환, 불일치 시 false.
   if (!input) return false;
   try {
     const h = await _sha256(input);
-    return h === _PWD_HASH;
+    if (h === _ADMIN_PWD_HASH) return 'admin';
+    if (h === _PWD_HASH)       return 'user';
+    return false;
   } catch (e) { return false; }
 }
 
@@ -3453,11 +3688,18 @@ function _setPwdState(state, msg) {
   const statusEl = document.getElementById('pwdStatus');
   const msgEl = document.getElementById('pwdMsg');
   const btn = document.getElementById('btnCalc');
-  gate.classList.remove('unlocked','error');
+  gate.classList.remove('unlocked','error','admin');
   if (state === 'unlocked') {
     gate.classList.add('unlocked');
     statusEl.textContent = '인증됨 / Unlocked';
     msgEl.style.display = 'none';
+    btn.removeAttribute('data-locked');
+  } else if (state === 'admin') {
+    gate.classList.add('admin');
+    statusEl.textContent = '관리자 / Admin';
+    msgEl.className = 'pwd-msg success';
+    msgEl.innerHTML = '👑 관리자 권한으로 인증되었습니다 (영업1팀)';
+    msgEl.style.display = 'block';
     btn.removeAttribute('data-locked');
   } else if (state === 'error') {
     gate.classList.add('error');
@@ -3478,15 +3720,21 @@ const _origCalculate = calculate;
 calculate = async function() {
   if (!_isUnlocked) {
     const pwdInput = document.getElementById('pwd');
-    const ok = await _verifyPwd(pwdInput.value);
-    if (!ok) {
+    const role = await _verifyPwd(pwdInput.value);
+    if (!role) {
       _setPwdState('error');
       pwdInput.focus();
       pwdInput.select();
       return;
     }
     _isUnlocked = true;
-    _setPwdState('unlocked');
+    if (role === 'admin') {
+      _isAdmin = true;
+      document.body.classList.add('admin-mode');
+      _setPwdState('admin');
+    } else {
+      _setPwdState('unlocked');
+    }
     // 입력값 마스킹 유지 + 인증 직후 비번칸 readonly 처리하여 노출 차단
     pwdInput.value = '••••••••';
     pwdInput.setAttribute('readonly','readonly');
@@ -3527,10 +3775,12 @@ if (document.readyState !== 'loading') {
   }, 0);
 }
 
-// resetForm 호출 시 비밀번호 인증 상태도 초기화
+// resetForm 호출 시 비밀번호 인증 상태(일반/관리자)도 초기화
 const _origResetForm = resetForm;
 resetForm = function() {
   _isUnlocked = false;
+  _isAdmin    = false;
+  document.body.classList.remove('admin-mode');
   const ip = document.getElementById('pwd');
   if (ip) {
     ip.removeAttribute('readonly');
@@ -4333,6 +4583,18 @@ function openLouverReport(modelType, modelCRT, cells) {
 }
 
 
+
+// ============ 원가 계산프로그램 (관리자 전용) ============
+function openCostProgram() {
+  // admin 모드가 아니라면 무시 (방어적 체크 — UI 자체가 숨겨져 있어 정상 케이스에선 도달 불가)
+  if (!_isAdmin) {
+    alert('관리자 권한이 필요합니다.');
+    return;
+  }
+  // 새 탭에서 원가 계산프로그램 열기
+  window.open('./files/원가선정프로그램.html', '_blank', 'noopener,noreferrer');
+}
+
 // ============ 인쇄 도우미 ============
 // 활성 모달에 .printing 클래스를 주고 window.print() 호출.
 // @media print 규칙이 .printing이 붙은 overlay만 표시하도록 작성됨.
@@ -4376,4 +4638,5 @@ closeReport = function(e) {
 </script>
 </body>
 </html>
+
 
