@@ -2088,108 +2088,142 @@
   }
 
 
-  /* ============ 관리자 전용 — 원가 계산프로그램 버튼 ============ */
+  /* ============ 관리자 전용 — 외부 프로그램 4종 그리드 ============ */
   /* 일반 페이지에서는 절대 표시되지 않도록 강제 */
   .admin-only { display: none !important; }
   body.admin-mode .admin-only { display: block !important; }
 
-  .admin-cost-block {
+  .admin-prog-block {
     grid-column: 1 / -1;
-    padding: 14px 32px 20px;
-    background: white;
-    border-top: 2px solid var(--ink-100);
+    padding: 16px 32px 22px;
+    background: var(--bg-50);
+    border-top: 1px solid var(--ink-100);
+    border-bottom: 1px solid var(--ink-100);
   }
-  .adm-cost-card {
-    background: linear-gradient(135deg, var(--org-700) 0%, var(--org-600) 55%, var(--pri-700) 130%);
-    border-radius: 12px;
-    padding: 16px 22px;
+  .admin-prog-block .adm-prog-head {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 11px;
+  }
+  .admin-prog-block .adm-prog-head .t {
+    font-size: 13.5px; font-weight: 800;
+    color: var(--pri-800);
+    letter-spacing: 0.4px;
+  }
+  .admin-prog-block .adm-prog-head .adm-badge {
+    background: var(--org-700); color: white;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 9px; border-radius: 10px;
+  }
+
+  .adm-prog-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .adm-prog-card {
+    background: white;
+    border: 1.5px solid var(--ink-150);
+    border-radius: 10px;
+    padding: 13px 14px;
     cursor: pointer;
-    color: white;
+    transition: all 0.2s;
     display: grid;
     grid-template-columns: auto 1fr auto;
-    gap: 18px;
+    gap: 12px;
     align-items: center;
-    box-shadow: 0 6px 18px rgba(216,67,21,0.20);
-    transition: all 0.2s;
-    border: 2px solid var(--org-700);
+    text-align: left;
+    font-family: inherit;
+    color: var(--ink-900);
     position: relative;
     overflow: hidden;
+    min-height: 64px;
   }
-  .adm-cost-card::before {
+  /* 카드 상단 미세한 액센트 라인 (각 프로그램별 고유 색) */
+  .adm-prog-card::before {
     content: ''; position: absolute;
     top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--org-500) 0%, white 50%, var(--pri-500) 100%);
-    opacity: 0.6;
+    transition: height 0.2s;
   }
-  .adm-cost-card:hover {
+  .adm-prog-card-cost::before { background: var(--org-600); }
+  .adm-prog-card-hvac::before { background: #0288d1; }
+  .adm-prog-card-ice::before  { background: #00acc1; }
+  .adm-prog-card-pump::before { background: var(--grn-600); }
+
+  .adm-prog-card:hover {
+    border-color: var(--pri-700);
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(216,67,21,0.32);
-    border-color: var(--org-800);
+    box-shadow: 0 6px 16px rgba(30,60,114,0.12);
   }
-  .adm-cost-card:active { transform: translateY(0); }
-  .adm-cost-card:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.4), 0 6px 18px rgba(216,67,21,0.32); }
+  .adm-prog-card:hover::before { height: 4px; }
+  .adm-prog-card:active { transform: translateY(0); }
+  .adm-prog-card:focus {
+    outline: none;
+    border-color: var(--pri-700);
+    box-shadow: 0 0 0 3px rgba(42,82,152,0.18);
+  }
 
-  .adm-cost-icon {
-    font-size: 32px;
-    line-height: 1;
-    background: rgba(255,255,255,0.18);
-    width: 56px; height: 56px;
+  .adm-prog-icon {
+    width: 42px; height: 42px;
     display: flex; align-items: center; justify-content: center;
-    border-radius: 14px;
+    font-size: 22px; line-height: 1;
+    border-radius: 9px;
     flex-shrink: 0;
   }
-  .adm-cost-text { min-width: 0; }
-  .adm-cost-title {
-    font-size: 17px; font-weight: 800;
-    letter-spacing: 0.3px;
-    line-height: 1.2;
-    margin-bottom: 4px;
-    display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
-  }
-  .adm-cost-title .adm-badge {
-    background: rgba(255,255,255,0.22);
-    color: white;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 3px 9px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.35);
-  }
-  .adm-cost-sub {
-    font-size: 12px;
-    opacity: 0.92;
-    letter-spacing: 0.2px;
-  }
-  .adm-cost-arrow {
-    font-size: 28px;
-    font-weight: 800;
-    opacity: 0.85;
-    flex-shrink: 0;
-    transition: transform 0.2s;
-  }
-  .adm-cost-card:hover .adm-cost-arrow { transform: translate(2px,-2px); opacity: 1; }
+  .adm-prog-card-cost .adm-prog-icon { background: var(--org-100); }
+  .adm-prog-card-hvac .adm-prog-icon { background: #e1f5fe; }
+  .adm-prog-card-ice  .adm-prog-icon { background: #e0f7fa; }
+  .adm-prog-card-pump .adm-prog-icon { background: var(--grn-100); }
 
-  /* 모바일 — 원가 카드 컴팩트 */
+  .adm-prog-text { min-width: 0; }
+  .adm-prog-title {
+    font-size: 13px; font-weight: 800;
+    color: var(--pri-800);
+    letter-spacing: 0.1px;
+    line-height: 1.25;
+    margin-bottom: 3px;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .adm-prog-sub {
+    font-size: 10.5px;
+    color: var(--ink-500);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+  .adm-prog-arrow {
+    font-size: 18px;
+    color: var(--ink-400);
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: transform 0.2s, color 0.2s;
+  }
+  .adm-prog-card:hover .adm-prog-arrow {
+    color: var(--pri-700);
+    transform: translate(2px,-2px);
+  }
+
+  /* 모바일 — 4 → 2 → 1 단계 */
+  @media (max-width: 880px) {
+    .adm-prog-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 760px) {
-    .admin-cost-block { padding: 12px 16px 16px; }
-    .adm-cost-card { padding: 13px 16px; gap: 14px; }
-    .adm-cost-icon { width: 48px; height: 48px; font-size: 26px; border-radius: 10px; }
-    .adm-cost-title { font-size: 15px; }
-    .adm-cost-title .adm-badge { font-size: 9.5px; padding: 2px 7px; }
-    .adm-cost-sub { font-size: 11px; }
-    .adm-cost-arrow { font-size: 22px; }
+    .admin-prog-block { padding: 13px 16px 18px; }
+    .admin-prog-block .adm-prog-head { margin-bottom: 9px; }
+    .admin-prog-block .adm-prog-head .t { font-size: 12.5px; }
+    .adm-prog-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .adm-prog-card { padding: 11px 12px; gap: 10px; min-height: 60px; }
+    .adm-prog-icon { width: 38px; height: 38px; font-size: 19px; border-radius: 8px; }
+    .adm-prog-title { font-size: 12px; }
+    .adm-prog-sub { font-size: 10px; }
   }
   @media (max-width: 480px) {
-    .admin-cost-block { padding: 10px 12px 14px; }
-    .adm-cost-card { grid-template-columns: auto 1fr; padding: 12px 14px; gap: 11px; }
-    .adm-cost-icon { width: 42px; height: 42px; font-size: 22px; }
-    .adm-cost-title { font-size: 14px; gap: 6px; }
-    .adm-cost-sub { font-size: 10.5px; }
-    .adm-cost-arrow { display: none; }
+    .admin-prog-block { padding: 11px 12px 14px; }
+    .adm-prog-grid { grid-template-columns: 1fr; gap: 7px; }
+    .adm-prog-card { grid-template-columns: auto 1fr; padding: 10px 12px; }
+    .adm-prog-arrow { display: none; }
   }
-  /* 인쇄에서는 admin 카드 숨김 */
-  @media print { .admin-cost-block { display: none !important; } }
+  /* 인쇄에서는 admin 그리드 숨김 */
+  @media print { .admin-prog-block { display: none !important; } }
 
   /* ============ 태블릿 / 좁은 노트북 (≤760px) ============ */
   @media (max-width: 760px) {
@@ -2715,19 +2749,52 @@
       </div>
     </div>
 
-    <!-- 관리자 전용: 냉각탑 원가 계산 프로그램 (영업1팀 인증 시에만 표시) -->
-    <div id="adminCostBlock" class="admin-cost-block admin-only">
-      <div class="adm-cost-card" onclick="openCostProgram()" role="button" tabindex="0"
-           onkeydown="if(event.key==='Enter'||event.key===' ')openCostProgram()">
-        <div class="adm-cost-icon">💰</div>
-        <div class="adm-cost-text">
-          <div class="adm-cost-title">
-            냉각탑 원가 계산프로그램
-            <span class="adm-badge">관리자 전용</span>
+    <!-- 관리자 전용 — 외부 프로그램 4종 (영업1팀 인증 시에만 표시) -->
+    <div id="adminProgBlock" class="admin-prog-block admin-only">
+      <div class="adm-prog-head">
+        <span class="t">▌영업1팀 전용 프로그램</span>
+        <span class="adm-badge">관리자 전용</span>
+      </div>
+      <div class="adm-prog-grid">
+        <button type="button" class="adm-prog-card adm-prog-card-cost"
+                onclick="openAdminProgram('https://jaewan0125-prog.github.io/sungji_cost/')">
+          <div class="adm-prog-icon">💰</div>
+          <div class="adm-prog-text">
+            <div class="adm-prog-title">냉각탑 원가 계산프로그램</div>
+            <div class="adm-prog-sub">Cooling Tower Cost</div>
           </div>
-          <div class="adm-cost-sub">Cooling Tower Cost Estimation · 영업1팀 내부 사용</div>
-        </div>
-        <div class="adm-cost-arrow">↗</div>
+          <div class="adm-prog-arrow">↗</div>
+        </button>
+
+        <button type="button" class="adm-prog-card adm-prog-card-hvac"
+                onclick="openAdminProgram('https://jaewan0125-prog.github.io/HVAC/')">
+          <div class="adm-prog-icon">🌡️</div>
+          <div class="adm-prog-text">
+            <div class="adm-prog-title">냉난방시스템 설계프로그램</div>
+            <div class="adm-prog-sub">HVAC Design</div>
+          </div>
+          <div class="adm-prog-arrow">↗</div>
+        </button>
+
+        <button type="button" class="adm-prog-card adm-prog-card-ice"
+                onclick="openAdminProgram('https://jaewan0125-prog.github.io/IceStorageSystem/')">
+          <div class="adm-prog-icon">🧊</div>
+          <div class="adm-prog-text">
+            <div class="adm-prog-title">빙축열시스템 설계프로그램</div>
+            <div class="adm-prog-sub">Ice Storage System</div>
+          </div>
+          <div class="adm-prog-arrow">↗</div>
+        </button>
+
+        <button type="button" class="adm-prog-card adm-prog-card-pump"
+                onclick="openAdminProgram('https://jaewan0125-prog.github.io/sungji_pump/')">
+          <div class="adm-prog-icon">⚙️</div>
+          <div class="adm-prog-text">
+            <div class="adm-prog-title">펌프선정프로그램</div>
+            <div class="adm-prog-sub">Pump Selection</div>
+          </div>
+          <div class="adm-prog-arrow">↗</div>
+        </button>
       </div>
     </div>
 
@@ -4584,15 +4651,23 @@ function openLouverReport(modelType, modelCRT, cells) {
 
 
 
-// ============ 원가 계산프로그램 (관리자 전용) ============
-function openCostProgram() {
+// ============ 관리자 전용 외부 프로그램 — 일반화된 오프너 ============
+function openAdminProgram(url) {
   // admin 모드가 아니라면 무시 (방어적 체크 — UI 자체가 숨겨져 있어 정상 케이스에선 도달 불가)
   if (!_isAdmin) {
     alert('관리자 권한이 필요합니다.');
     return;
   }
-  // 새 탭에서 원가 계산프로그램 열기 (GitHub Pages 호스팅)
-  window.open('https://jaewan0125-prog.github.io/sungji_cost/', '_blank', 'noopener,noreferrer');
+  if (!url || !/^https?:\/\//.test(url)) {
+    alert('올바르지 않은 주소입니다.');
+    return;
+  }
+  // 새 탭에서 외부 프로그램 열기
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+// 하위호환 — 기존 onclick="openCostProgram()" 호출이 남아있어도 동작하도록 alias
+function openCostProgram() {
+  openAdminProgram('https://jaewan0125-prog.github.io/sungji_cost/');
 }
 
 // ============ 인쇄 도우미 ============
@@ -4638,4 +4713,5 @@ closeReport = function(e) {
 </script>
 </body>
 </html>
+
 
