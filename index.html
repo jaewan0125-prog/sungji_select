@@ -864,21 +864,11 @@
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
     html, body {
-      /* @page의 margin이 자동으로 인쇄 영역을 잘라주므로 너비를 명시하지 않음 */
-      width: auto !important; max-width: 100% !important;
-      height: auto !important; min-height: 0 !important;
+      width: 210mm; height: auto !important; min-height: 0 !important;
       background: white !important;
       margin: 0 !important; padding: 0 !important;
       overflow: visible !important;
-      box-sizing: border-box;
     }
-    body * { box-sizing: border-box !important; max-width: 100%; }
-    .report-table, .calc-unified, .calc-table, .ov-fullspec, .ov-flowtable {
-      table-layout: fixed !important; word-wrap: break-word !important;
-    }
-    .calc-unified thead th { white-space: nowrap !important; }
-    .report-selected { grid-template-columns: minmax(0, 1fr) auto !important; }
-    .report-selected .model-spec-row { flex-wrap: wrap !important; }
 
     /* 본문 컨테이너 + 활성 표식 없는 모든 모달은 인쇄에서 제외 */
     body > .container,
@@ -2224,6 +2214,39 @@
   }
   /* 인쇄에서는 admin 그리드 숨김 */
   @media print { .admin-prog-block { display: none !important; } }
+
+
+  /* 자료 미보유 시 — 사양서/도면 버튼 비활성 표시 */
+  .ov-action.disabled {
+    background: var(--bg-50) !important;
+    border-color: var(--ink-200) !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+    filter: grayscale(1);
+  }
+  .ov-action.disabled .icon { opacity: 0.55; }
+  .ov-action.disabled .label { color: var(--ink-500) !important; }
+  .ov-action.disabled .sub { color: var(--ink-400) !important; }
+  .ov-action.disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    background: var(--bg-50) !important;
+    border-color: var(--ink-200) !important;
+  }
+  /* 비활성 라벨 우측에 작게 "자료없음" 칩 */
+  .ov-action.disabled::after {
+    content: '자료 없음';
+    position: absolute;
+    top: 6px; right: 6px;
+    background: var(--ink-300);
+    color: var(--ink-700);
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .ov-action { position: relative; }
 
   /* ============ 태블릿 / 좁은 노트북 (≤760px) ============ */
   @media (max-width: 760px) {
@@ -3864,9 +3887,50 @@ document.querySelectorAll('input').forEach(input => {
   });
 });
 
-// ============ 자료 파일 경로 ============
-const SPEC_FILE_PATH = './files/spec.hwp';
-const DRAWING_FILE_PATH = './files/drawing.dwg';
+// ============ 자료 파일 매니페스트 (모델·용량·옵션·셀별) ============
+// 첨부된 사양서/도면 zip 에서 추출한 파일 인덱스
+const ASSET_MANIFEST = {"SJMO": {"200": {"PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,200CRT)-소음,백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 200_백연 + 소음기.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,200CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 200_백연.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,200CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 200_소음기.dwg"}}, "basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,200CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 200.dwg"}}}, "250": {"basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,250CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 250.dwg"}}, "PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,250CRT)-소음,백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 250_백연 + 소음기.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,250CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 250_소음기.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,250CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 250_백연.dwg"}}}, "175": {"P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,175CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 175_백연.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,175CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 175_소음기.dwg"}}, "basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,175CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 175.dwg"}}, "PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,175CRT)-백연, 소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 175_백연 + 소음기.dwg"}}}, "350": {"basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,350CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 350.dwg"}}, "PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,350CRT)-백연,소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 350_백연 + 소음기.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,350CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 350_백연.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,350CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 350_소음기.dwg"}}}, "400": {"S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,400CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 400_소음기.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,400CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 400_백연.dwg"}}, "basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,400CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 400.dwg"}}, "PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,400CRT)-백연, 소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 400_백연 + 소음기.dwg"}}}, "300": {"PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,300CRT)-백연, 소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 300_백연 + 소음기.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,300CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 300_소음기.dwg"}}, "basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,300CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 300.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,300CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 300_백연.dwg"}}}, "125": {"P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,125CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 125_백연.dwg"}}, "PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,125CRT)-백연, 소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 125_백연 + 소음기.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,125CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 125_소음기.dwg"}}, "basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,125CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 125.dwg"}}}, "100": {"basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,100CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 100.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,100CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 100_백연.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,100CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 100_소음기.dwg"}}, "PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,100CRT)-백연, 소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 100_백연 + 소음기.dwg"}}}, "225": {"basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,225CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 225.dwg"}}, "PS": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,225CRT)-백연, 소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 225_백연 + 소음기.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,225CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 225_소음기.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,225CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 225_백연.dwg"}}}, "150": {"basic": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,150CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 150.dwg"}}, "P": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,150CRT)-백연.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 150_백연.dwg"}}, "S": {"spec": "./files/사양서/SJMO/냉각탑 사양서 (압입식 모듈형,150CRT)-소음.hwp", "drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 150_소음기.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 150_백연 + 소음기.dwg"}}}, "450": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 450_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 450_백연 + 소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 450_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 450.dwg"}}}, "500": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연/SJMO 500_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 백연 + 소음기/SJMO 500_백연 + 소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준 + 소음기/SJMO 500 소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO 1CELL/표준/SJMO 500.dwg"}}}}, "SJCO": {"250": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,250CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,250CRT)-기본.dwg"}}}, "600": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,600CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,600CRT)-기본.dwg"}}}, "800": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,800CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,800CRT)-기본.dwg"}}}, "175": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,175CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,175CRT)-기본_recover.dwg"}}}, "1000": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,1000CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,1000CRT)-기본.dwg"}}}, "500": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,500CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,500CRT)-기본.dwg"}}}, "450": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,450CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,450CRT)-기본.dwg"}}}, "900": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,900CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,900CRT)-기본.dwg"}}}, "400": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,400CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,400CRT)-기본.dwg"}}}, "150": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,150CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,150CRT)-기본.dwg"}}}, "350": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,350CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,350CRT)-기본.dwg"}}}, "300": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,300CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,300CRT)-기본.dwg"}}}, "125": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,125CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,125CRT)-기본.dwg"}}}, "225": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,225CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,225CRT)-기본.dwg"}}}, "700": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,700CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,700CRT)-기본_recover.dwg"}}}, "100": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,100CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,100CRT)-기본.dwg"}}}, "200": {"basic": {"spec": "./files/사양서/SJCO/냉각탑 사양서 (사각대향류,200CRT)-기본.hwp", "drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,200CRT)-기본.dwg"}}}, "1200": {"basic": {"drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,1200CRT)-기본.dwg"}}}, "1100": {"basic": {"drawings": {"1": "./files/제작도면/SJCO/SJCO 1CELL/SJCO 표준/냉각탑 제작도면 (사각대향류,1100CRT)-기본.dwg"}}}}, "SJXO": {"250": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,250CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 250CRT).dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 250_백연 + 소음기.dwg"}}}, "800": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,800CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 800CRT)_recover.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 800_백연 + 소음기.dwg"}}}, "500": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,500CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 500CRT).dwg"}}}, "175": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,175CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 175CRT).dwg"}}}, "1400": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,1400CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 1400CRT).dwg"}}}, "600": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,600CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 600CRT).dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 600_백연 + 소음기.dwg"}}}, "900": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,900CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 900CRT).dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 900_백연 + 소음기.dwg"}}}, "400": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,400CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 400CRT) 수정 20200312.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 400_백연 + 소음기.dwg"}}}, "350": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,350CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 350CRT).dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 350_백연 + 소음기.dwg"}}}, "300": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,300CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 300CRT).dwg"}}}, "200": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,200CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 200CRT).dwg"}}}, "1000": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,1000CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 1000CRT) 수정2 20200313.dwg"}}}, "100": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,100CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 100CRT).dwg"}}}, "1200": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,1200CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 1200CRT).dwg"}}}, "450": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,450CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 450CRT).dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 450_백연 + 소음기.dwg"}}}, "1300": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,1300CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 1300CRT).dwg"}}}, "700": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,700CRT).hwp"}}, "225": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,225CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 225CRT).dwg"}}}, "1100": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,1100CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 1100CRT).dwg"}}}, "125": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,125CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 125CRT).dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 125_백연 + 소음기.dwg"}}}, "1500": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,1500CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 1500CRT).dwg"}}}, "150": {"basic": {"spec": "./files/사양서/SJXO/냉각탑 사양서 (철재직교류형,150CRT).hwp", "drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO 표준/냉각탑 제작도면 (철재직교류형, 150CRT).dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJXO/SJXO 1CELL/SJXO_소음기 + 백연/SJXO 150_백연 + 소음기.dwg"}}}}, "SJMO-A": {"450": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-450_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-450_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-450_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-450.dwg"}}}, "200": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-200_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-200_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-200_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-200.dwg"}}}, "250": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-250_백연.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-250_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-250.dwg"}}}, "300": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-300_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-300_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-300_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-300.dwg"}}}, "150": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-150_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-150_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-150_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-150.dwg"}}}, "400": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-400_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-400_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-400_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-400.dwg"}}}, "500": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-500_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-500_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-500_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-500.dwg"}}}, "175": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-175_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-175_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-175_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-175.dwg"}}}, "350": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-350_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-350_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-350_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-350.dwg"}}}, "225": {"P": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연/SJMO(A)-225_백연.dwg"}}, "PS": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 백연 + 소음기/SJMO(A)-225_백연+소음기.dwg"}}, "S": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준 + 소음기/SJMO(A)-225_소음기.dwg"}}, "basic": {"drawings": {"1": "./files/제작도면/SJMO/SJMO(A) 1CELL/표준/SJMO(A)-225.dwg"}}}}};
+
+// 옵션 코드 → 매니페스트 variant 키
+//   '' (기본)            → 'basic'
+//   'P' (백연감소)        → 'P'
+//   'S' (소음기 둘다)     → 'S'
+//   'IS' (흡입소음기만)   → 'S'  (단측 → 양측 자료로 대체)
+//   'DS' (토출소음기만)   → 'S'
+//   'SP' / 'PS' (백연+소음) → 'PS'
+function _variantKey(modelType, I) {
+  // SJCO/SJXO 는 옵션 미적용 — 항상 basic
+  if (modelType !== 'SJMO' && modelType !== 'SJMO-A') return 'basic';
+  const both = I.optInletSil && I.optDischargeSil;
+  let s = '';
+  if (I.optMist) s += 'P';
+  if (both) s += 'S';
+  else if (I.optInletSil || I.optDischargeSil) s += 'S';
+  return s || 'basic';
+}
+
+function _assetEntry(modelType, modelCRT, I) {
+  const m = ASSET_MANIFEST[modelType];
+  if (!m) return null;
+  const cap = m[String(modelCRT)];
+  if (!cap) return null;
+  const vk = _variantKey(modelType, I);
+  // 우선순위: 매칭 variant → basic 폴백
+  return cap[vk] || cap['basic'] || null;
+}
+
+function _specPath(modelType, modelCRT, I) {
+  const e = _assetEntry(modelType, modelCRT, I);
+  return (e && e.spec) ? e.spec : null;
+}
+
+function _drawingPath(modelType, modelCRT, cells, I) {
+  const e = _assetEntry(modelType, modelCRT, I);
+  if (!e || !e.drawings) return null;
+  // 우선 정확한 셀 매칭, 없으면 1cell 자료로 폴백
+  const cellKey = String(cells);
+  return e.drawings[cellKey] || e.drawings['1'] || null;
+}
 
 // ============ 모델별 개념도 (성지공조기술 카탈로그 발췌) ============
 const MODEL_DIAGRAMS = {
@@ -4040,6 +4104,19 @@ function openOverview(modelType, modelCRT, cells) {
     </table>
   `;
 
+  // 5개 자료 버튼 가용성 표시 (선정서/보급수/루버는 항상 활성, 사양서/도면은 매니페스트 조회)
+  const footer = document.querySelector('.ov-footer');
+  if (footer) {
+    const btnSpec    = footer.querySelector("[onclick=\"ovChooseDoc('spec')\"]");
+    const btnDrawing = footer.querySelector("[onclick=\"ovChooseDoc('drawing')\"]");
+    const specOK    = !!_specPath(modelType, modelCRT, I);
+    const drawingOK = !!_drawingPath(modelType, modelCRT, cells, I);
+    if (btnSpec)    btnSpec.classList.toggle('disabled',    !specOK);
+    if (btnDrawing) btnDrawing.classList.toggle('disabled', !drawingOK);
+    if (btnSpec)    btnSpec.title    = specOK    ? '사양서 다운로드' : '자료 준비 안됨 (해당 모델 사양서 없음)';
+    if (btnDrawing) btnDrawing.title = drawingOK ? '도면 다운로드'  : '자료 준비 안됨 (해당 모델/셀 도면 없음)';
+  }
+
   document.querySelectorAll('.ov-tab').forEach((t,i) => t.classList.toggle('active', i===0));
   document.querySelectorAll('.ov-pane').forEach((p,i) => p.classList.toggle('active', i===0));
 
@@ -4073,11 +4150,21 @@ function ovChooseDoc(action) {
     return;
   }
   if (action === 'spec') {
-    triggerDownload(SPEC_FILE_PATH, `${ctx.modelType}-${ctx.modelCRT}_사양서.hwp`);
+    const p = _specPath(ctx.modelType, ctx.modelCRT, ctx.I);
+    if (!p) {
+      alert(`해당 모델의 사양서 자료가 없습니다.\n\n${_modelLabel(ctx.modelType)}-${ctx.modelCRT}${_optionSuffix(ctx.modelType, ctx.I)}\n\n자료 준비 후 추가 예정입니다.`);
+      return;
+    }
+    triggerDownload(p, `${_modelLabel(ctx.modelType)}-${ctx.modelCRT}${_optionSuffix(ctx.modelType, ctx.I)}_사양서.hwp`);
     return;
   }
   if (action === 'drawing') {
-    triggerDownload(DRAWING_FILE_PATH, `${ctx.modelType}-${ctx.modelCRT}_도면.dwg`);
+    const p = _drawingPath(ctx.modelType, ctx.modelCRT, ctx.cells, ctx.I);
+    if (!p) {
+      alert(`해당 모델/셀 구성의 도면 자료가 없습니다.\n\n${_modelLabel(ctx.modelType)}-${ctx.modelCRT}${_optionSuffix(ctx.modelType, ctx.I)} × ${ctx.cells}Cell\n\n자료 준비 후 추가 예정입니다.`);
+      return;
+    }
+    triggerDownload(p, `${_modelLabel(ctx.modelType)}-${ctx.modelCRT}${_optionSuffix(ctx.modelType, ctx.I)}_${ctx.cells}Cell_도면.dwg`);
     return;
   }
   if (action === 'makeup') {
@@ -4111,13 +4198,50 @@ function closePh(e) {
 }
 
 function triggerDownload(url, suggestedName) {
+  // 한글·공백·괄호·쉼표 등 특수문자가 포함된 경로는 반드시 percent-encoding 필요.
+  // (이미 인코딩된 문자가 있을 수 있어 한 번 디코드 후 재인코딩 — 이중 인코딩 방지)
+  let safeUrl = url;
+  try { safeUrl = encodeURI(decodeURI(url)); }
+  catch (e) { safeUrl = encodeURI(url); }
+
+  // file:// 환경에서도 동작하도록 fetch + Blob 방식을 우선 시도, 실패 시 anchor click 폴백
+  const useFetch = location.protocol !== 'file:';
+  if (useFetch && typeof fetch === 'function') {
+    fetch(safeUrl).then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.blob();
+    }).then(blob => {
+      const burl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = burl;
+      a.download = suggestedName;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        if (a.parentNode) a.parentNode.removeChild(a);
+        URL.revokeObjectURL(burl);
+      }, 200);
+    }).catch(err => {
+      console.warn('fetch download failed, fallback to anchor:', err);
+      _anchorDownload(safeUrl, suggestedName);
+    });
+  } else {
+    _anchorDownload(safeUrl, suggestedName);
+  }
+}
+function _anchorDownload(safeUrl, suggestedName) {
   const a = document.createElement('a');
-  a.href = url;
+  a.href = safeUrl;
   a.download = suggestedName;
-  a.target = '_blank';
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  // target=_blank 가 있으면 일부 브라우저에서 download 속성을 무시하므로 미설정
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
+  setTimeout(() => {
+    if (a.parentNode) a.parentNode.removeChild(a);
+  }, 100);
 }
 
 // ============ 선정서 (Selection Report) 모달 ============
@@ -4713,3 +4837,4 @@ closeReport = function(e) {
 </script>
 </body>
 </html>
+
