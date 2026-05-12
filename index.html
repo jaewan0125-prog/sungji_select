@@ -2108,7 +2108,7 @@
 
   .adm-prog-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
   }
   .adm-prog-card {
@@ -2127,7 +2127,7 @@
     color: var(--ink-900);
     position: relative;
     overflow: hidden;
-    min-height: 64px;
+    min-height: 72px;
   }
   /* 카드 상단 미세한 액센트 라인 (각 프로그램별 고유 색) */
   .adm-prog-card::before {
@@ -2136,6 +2136,7 @@
     transition: height 0.2s;
   }
   .adm-prog-card-cost::before { background: var(--org-600); }
+  .adm-prog-card-temp::before { background: #5e35b1; }
   .adm-prog-card-hvac::before { background: #0288d1; }
   .adm-prog-card-ice::before  { background: #00acc1; }
   .adm-prog-card-pump::before { background: var(--grn-600); }
@@ -2161,19 +2162,20 @@
     flex-shrink: 0;
   }
   .adm-prog-card-cost .adm-prog-icon { background: var(--org-100); }
+  .adm-prog-card-temp .adm-prog-icon { background: #ede7f6; }
   .adm-prog-card-hvac .adm-prog-icon { background: #e1f5fe; }
   .adm-prog-card-ice  .adm-prog-icon { background: #e0f7fa; }
   .adm-prog-card-pump .adm-prog-icon { background: var(--grn-100); }
 
   .adm-prog-text { min-width: 0; }
   .adm-prog-title {
-    font-size: 13px; font-weight: 800;
+    font-size: 12.5px; font-weight: 800;
     color: var(--pri-800);
     letter-spacing: 0.1px;
-    line-height: 1.25;
-    margin-bottom: 3px;
-    overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.3;
+    margin-bottom: 4px;
   }
+  .adm-prog-title br { display: inline; }
   .adm-prog-sub {
     font-size: 10.5px;
     color: var(--ink-500);
@@ -2194,14 +2196,14 @@
 
   /* 모바일 — 4 → 2 → 1 단계 */
   @media (max-width: 880px) {
-    .adm-prog-grid { grid-template-columns: repeat(2, 1fr); }
+    .adm-prog-grid { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 760px) {
     .admin-prog-block { padding: 13px 16px 18px; }
     .admin-prog-block .adm-prog-head { margin-bottom: 9px; }
     .admin-prog-block .adm-prog-head .t { font-size: 12.5px; }
     .adm-prog-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .adm-prog-card { padding: 11px 12px; gap: 10px; min-height: 60px; }
+    .adm-prog-card { padding: 11px 12px; gap: 10px; min-height: 68px; }
     .adm-prog-icon { width: 38px; height: 38px; font-size: 19px; border-radius: 8px; }
     .adm-prog-title { font-size: 12px; }
     .adm-prog-sub { font-size: 10px; }
@@ -2783,8 +2785,18 @@
                 onclick="openAdminProgram('https://jaewan0125-prog.github.io/sungji_cost/')">
           <div class="adm-prog-icon">💰</div>
           <div class="adm-prog-text">
-            <div class="adm-prog-title">냉각탑 원가 계산프로그램</div>
+            <div class="adm-prog-title">냉각탑<br>원가 계산프로그램</div>
             <div class="adm-prog-sub">Cooling Tower Cost</div>
+          </div>
+          <div class="adm-prog-arrow">↗</div>
+        </button>
+
+        <button type="button" class="adm-prog-card adm-prog-card-temp"
+                onclick="openCoolingTempCal()">
+          <div class="adm-prog-icon">🧮</div>
+          <div class="adm-prog-text">
+            <div class="adm-prog-title">냉각탑<br>온도 계산프로그램</div>
+            <div class="adm-prog-sub">Cooling Tower Temp Calc</div>
           </div>
           <div class="adm-prog-arrow">↗</div>
         </button>
@@ -2793,7 +2805,7 @@
                 onclick="openAdminProgram('https://jaewan0125-prog.github.io/HVAC/')">
           <div class="adm-prog-icon">🌡️</div>
           <div class="adm-prog-text">
-            <div class="adm-prog-title">냉난방시스템 설계프로그램</div>
+            <div class="adm-prog-title">냉난방시스템<br>설계프로그램</div>
             <div class="adm-prog-sub">HVAC Design</div>
           </div>
           <div class="adm-prog-arrow">↗</div>
@@ -2803,7 +2815,7 @@
                 onclick="openAdminProgram('https://jaewan0125-prog.github.io/IceStorageSystem/')">
           <div class="adm-prog-icon">🧊</div>
           <div class="adm-prog-text">
-            <div class="adm-prog-title">빙축열시스템 설계프로그램</div>
+            <div class="adm-prog-title">빙축열시스템<br>설계프로그램</div>
             <div class="adm-prog-sub">Ice Storage System</div>
           </div>
           <div class="adm-prog-arrow">↗</div>
@@ -4794,6 +4806,73 @@ function openCostProgram() {
   openAdminProgram('https://jaewan0125-prog.github.io/sungji_cost/');
 }
 
+// ============ 냉각탑 온도 계산프로그램 (선정값 자동 전달) ============
+function openCoolingTempCal() {
+  if (!_isAdmin) {
+    alert('관리자 권한이 필요합니다.');
+    return;
+  }
+
+  // ----- 1) 현재 입력 폼 상태 읽기 -----
+  const num = (id) => {
+    const v = parseFloat(document.getElementById(id).value);
+    return isNaN(v) ? null : v;
+  };
+  const flowRaw  = num('flow');
+  const flowUnit = document.getElementById('flowUnitSel').value;   // 'm3h' or 'lpm'
+  const tin      = num('tin');
+  const tout     = num('tout');
+  const twb      = num('twb');
+  const cells    = parseInt(document.getElementById('cells').value) || 1;
+  let   ctType   = document.getElementById('ctType').value;        // SJMO / SJMO-A / SJCO / SJXO / ALL
+
+  // 유량 단위 변환 — m³/h 로 통일
+  const flowM3h = (flowRaw !== null)
+    ? (flowUnit === 'm3h' ? flowRaw : flowRaw * 60 / 1000)
+    : null;
+
+  // ----- 2) 시리즈 / 추천 용량 결정 -----
+  // 1순위: 이미 선정된 모델이 있으면 그 값 사용 (_ovContext)
+  // 2순위: 현재 입력값으로 즉시 계산하여 추천 용량 산출
+  // 3순위: 둘 다 안되면 SJMO 기본 + 용량 미지정
+  let series = (ctType && ctType !== 'ALL') ? ctType : 'SJMO';
+  let modelCRT = null;
+
+  if (typeof _ovContext !== 'undefined' && _ovContext && _ovContext.modelType) {
+    series   = _ovContext.modelType;
+    modelCRT = _ovContext.modelCRT;
+  } else if (flowM3h !== null && tin !== null && tout !== null && twb !== null) {
+    const rf     = num('rf') || 1.0;
+    const margin = num('margin') || 10;
+    const minCap = flowM3h / 0.78 / rf;
+    const recCap = minCap * (1 + margin/100);
+    const perCell = recCap / cells;
+    if (typeof selectModel === 'function') {
+      modelCRT = selectModel(series, perCell);
+    }
+  }
+
+  // ----- 3) URL 파라미터 빌드 -----
+  const p = new URLSearchParams();
+  p.set('mode', 'auto_flow');           // 산출모드 = 총유량자동산출
+  p.set('series', series);
+  if (modelCRT) p.set('model', String(modelCRT));
+  p.set('cells', String(cells));
+  p.set('fan_rpm', '100');              // 송풍기 회전수 100% 기본
+  if (tin  !== null) p.set('tin',  String(tin));
+  if (tout !== null) p.set('tout', String(tout));
+  if (twb  !== null) p.set('twb',  String(twb));
+  if (flowM3h !== null) p.set('flow', flowM3h.toFixed(2));
+
+  // 부속 옵션도 함께 전달 (선택사항)
+  if (document.getElementById('optMist').checked)             p.set('mist', '1');
+  if (document.getElementById('optInletSilencer').checked)    p.set('silencer_in', '1');
+  if (document.getElementById('optDischargeSilencer').checked) p.set('silencer_out', '1');
+
+  const url = 'https://jaewan0125-prog.github.io/coolingtower-cal/?' + p.toString();
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 // ============ 인쇄 도우미 ============
 // 활성 모달에 .printing 클래스를 주고 window.print() 호출.
 // @media print 규칙이 .printing이 붙은 overlay만 표시하도록 작성됨.
@@ -4837,4 +4916,5 @@ closeReport = function(e) {
 </script>
 </body>
 </html>
+
 
